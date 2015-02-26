@@ -59,6 +59,13 @@ var Body = Backgrid.Body = Backbone.View.extend({
     this.listenTo(collection, "reset", this.refresh);
     this.listenTo(collection, "backgrid:sort", this.sort);
     this.listenTo(collection, "backgrid:edited", this.moveToNextCell);
+
+    this.listenToOnce(collection, "sync", function() {
+      if (collection.state.sortKey) {
+        var column = this.columns.findWhere({name: collection.state.sortKey});
+        column.set("direction", (collection.state.order == -1) ? 'ascending' : 'descending');
+      }
+    });
   },
 
   _unshiftEmptyRowMayBe: function () {
