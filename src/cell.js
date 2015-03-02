@@ -1023,3 +1023,26 @@ var SelectCell = Backgrid.SelectCell = Cell.extend({
   }
 
 });
+
+var HtmlCell = Backgrid.HtmlCell = Backbone.View.extend({
+  tagName : "td",
+
+  initialize: function (options) {
+    this.html = options.html || ''
+
+    this.column = options.column;
+    if (!(this.column instanceof Column)) {
+      this.column = new Column(this.column);
+    }
+
+    var column = this.column, model = this.model, $el = this.$el;
+    if (Backgrid.callByNeed(column.renderable(), column, model)) $el.addClass("renderable");
+  },
+
+  render: function () {
+    this.$el.empty();
+    this.$el.html(this.html);
+    this.delegateEvents();
+    return this;
+  }
+});

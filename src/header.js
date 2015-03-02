@@ -170,6 +170,127 @@ var HeaderRow = Backgrid.HeaderRow = Backgrid.Row.extend({
 
 });
 
+var FilterRow = Backgrid.FilterRow = Backgrid.HeaderRow.extend({
+  initialize: function () {
+    this.filters = [];
+    this.collectionInited = false;
+
+    Backgrid.HeaderRow.prototype.initialize.apply(this, arguments);
+  },
+
+  /** @property */
+  events: {
+    "change :input": "onFilterChange"
+  },
+
+  makeCell: function (column, options) {
+    var filter = column.get('filter'), html;
+
+    if (filter) {
+      this.filters.push(column.get('name'));
+
+      if (_.isString(filter)) {
+        html = filter;
+      } else {
+        html = this.createFilterHtml(column, filter);
+      }
+    } else {
+      html = '';
+    }
+
+    return new Backgrid.HtmlCell({
+      column : column,
+      tagName : 'th',
+      html : html
+    });
+  },
+
+  createFilterHtml : function(column, filter) {
+    var out = '',
+      attrs = _.extend({
+        name : column.get('name')
+      }, filter.attrs),
+      $wrapper = $('<div></div>');
+
+    switch (filter.type) {
+      case 'text':
+        var $el = $('<input type="text" />');
+        $el.attr(attrs);
+
+        if (!_.isUndefined(filter.value)) {
+          $el.attr('value', filter.value);
+        }
+
+        $wrapper.append($el)
+        break;
+      case 'select':
+        var $el = $('<select></select>');
+        $el.attr(attrs);
+
+        if (filter.options) {
+          _.each(filter.options, function(props) {
+            var value = _.keys(props)[0],
+              label = props[value],
+              $option = $('<option></option>')
+            ;
+
+            $option.attr({
+              value : value,
+            });
+            $option.text(label);
+            $el.append($option);
+
+            if (filter.value == value) {
+              $option.attr({selected : 'selected'});
+            }
+          });
+        }
+
+        $wrapper.append($el)
+        break;
+      default:
+        throw new Error("Incorrect filter.type for column '" + column.get('name') + "': '" + filter.type + "'.");
+    }
+
+    return $wrapper.html();
+  },
+
+  /**
+   * Determine, shall we display row with filters or not?
+   */
+  isVisible : function() {
+    return (this.filters.length > 0);
+  },
+
+  onFilterChange : function() {
+    var self = this;
+
+    //init collection only once
+    if (!this.collectionInited) {
+      this.$el.find(':input').each(function (key, el) {
+        var $el = $(el);
+
+        (function ($el, self) {
+          self.collection.queryParams[$el.attr('name')] = function () {
+            if ($el.val() !== '') {
+              return $el.val();
+            }
+
+            return null;
+          }
+        })($el, self);
+      });
+
+      this.collectionInited = true;
+    }
+
+    this.collection.getFirstPage({
+      reset: true,
+      fetch: true
+    });
+  }
+});
+
 /**
    Header is a special structural view class that renders a table head with a
    single row of header cells.
@@ -202,6 +323,11 @@ var Header = Backgrid.Header = Backbone.View.extend({
       columns: this.columns,
       collection: this.collection
     });
+
+    this.filterRow = new Backgrid.FilterRow({
+      columns: this.columns,
+      collection: this.collection
+    })
   },
 
   /**
@@ -209,6 +335,11 @@ var Header = Backgrid.Header = Backbone.View.extend({
    */
   render: function () {
     this.$el.append(this.row.render().$el);
+
+    if (this.filterRow.isVisible()) {
+      this.$el.append(this.filterRow.render().$el);
+    }
+
     this.delegateEvents();
     return this;
   },
