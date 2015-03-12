@@ -263,9 +263,16 @@ var FilterRow = Backgrid.FilterRow = Backgrid.HeaderRow.extend({
   },
 
   onFilterChange : function() {
+    this.initCollectionQueryParams();
+    this.collection.getFirstPage({
+      reset: true,
+      fetch: true
+    });
+  },
+
+  initCollectionQueryParams : function() {
     var self = this;
 
-    //init collection only once
     if (!this.collectionInited) {
       this.$el.find(':input').each(function (key, el) {
         var $el = $(el);
@@ -283,11 +290,6 @@ var FilterRow = Backgrid.FilterRow = Backgrid.HeaderRow.extend({
 
       this.collectionInited = true;
     }
-
-    this.collection.getFirstPage({
-      reset: true,
-      fetch: true
-    });
   }
 });
 
