@@ -264,6 +264,7 @@ var FilterRow = Backgrid.FilterRow = Backgrid.HeaderRow.extend({
 
   onFilterChange : function() {
     this.initCollectionQueryParams();
+    this.collection.trigger('backgrid:beforeHeaderFilterRefresh');
     this.collection.getFirstPage({
       reset: true,
       fetch: true
