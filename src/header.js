@@ -228,14 +228,14 @@ var FilterRow = Backgrid.FilterRow = Backgrid.HeaderRow.extend({
         $el.attr(attrs);
 
         if (filter.options) {
-          _.each(filter.options, function(props) {
-            var value = _.keys(props)[0],
-              label = props[value],
+          _.each(filter.options, function(item) {
+            var value = item[0],
+              label = item[1],
               $option = $('<option></option>')
             ;
 
             $option.attr({
-              value : value,
+              value : value
             });
             $option.text(label);
             $el.append($option);
