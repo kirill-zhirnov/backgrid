@@ -1028,7 +1028,7 @@ var HtmlCell = Backgrid.HtmlCell = Backbone.View.extend({
   tagName : "td",
 
   initialize: function (options) {
-    this.html = options.html || ''
+    this.html = options.html || undefined;
 
     this.column = options.column;
     if (!(this.column instanceof Column)) {
@@ -1037,11 +1037,21 @@ var HtmlCell = Backgrid.HtmlCell = Backbone.View.extend({
 
     var column = this.column, model = this.model, $el = this.$el;
     if (Backgrid.callByNeed(column.renderable(), column, model)) $el.addClass("renderable");
+
+    if (_.isUndefined(this.html) && column.get('html')) {
+      this.html = column.get('html');
+    }
   },
 
   render: function () {
     this.$el.empty();
-    this.$el.html(this.html);
+
+    var value = this.html;
+    if (_.isFunction(this.html)) {
+      value = this.html.call(this, this.column, this.model, this.$el);
+    }
+
+    this.$el.html(value);
     this.delegateEvents();
     return this;
   }
