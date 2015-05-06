@@ -251,6 +251,8 @@ var Cell = Backgrid.Cell = Backbone.View.extend({
     if (Backgrid.callByNeed(column.editable(), column, model)) $el.addClass("editable");
     if (Backgrid.callByNeed(column.sortable(), column, model)) $el.addClass("sortable");
     if (Backgrid.callByNeed(column.renderable(), column, model)) $el.addClass("renderable");
+
+    $el.addClass("column-" + column.get('name'));
   },
 
   /**
@@ -1041,6 +1043,8 @@ var HtmlCell = Backgrid.HtmlCell = Backbone.View.extend({
     if (_.isUndefined(this.html) && column.get('html')) {
       this.html = column.get('html');
     }
+
+    this.$el.addClass("column-" + column.get('name'));
   },
 
   render: function () {

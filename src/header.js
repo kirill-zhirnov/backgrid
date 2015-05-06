@@ -127,7 +127,7 @@ var HeaderCell = Backgrid.HeaderCell = Backbone.View.extend({
     }
 
     this.$el.append(label);
-    this.$el.addClass(column.get("name"));
+    this.$el.addClass('column-' + column.get("name"));
     this.$el.addClass(column.get("direction"));
     this.delegateEvents();
     return this;
