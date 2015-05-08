@@ -212,13 +212,20 @@ var FilterRow = Backgrid.FilterRow = Backgrid.HeaderRow.extend({
       }, filter.attrs),
       $wrapper = $('<div></div>');
 
+    var filterValue = null;
+    if (column.get('name') in this.collection.queryParams) {
+      filterValue = this.collection.queryParams[column.get('name')];
+    } else if (!_.isUndefined(filter.value)) {
+      filterValue = filter.value;
+    }
+
     switch (filter.type) {
       case 'text':
         var $el = $('<input type="text" />');
         $el.attr(attrs);
 
-        if (!_.isUndefined(filter.value)) {
-          $el.attr('value', filter.value);
+        if (filterValue !== null) {
+          $el.attr('value', filterValue);
         }
 
         $wrapper.append($el)
@@ -240,7 +247,7 @@ var FilterRow = Backgrid.FilterRow = Backgrid.HeaderRow.extend({
             $option.text(label);
             $el.append($option);
 
-            if (filter.value == value) {
+            if (filterValue == value) {
               $option.attr({selected : 'selected'});
             }
           });
