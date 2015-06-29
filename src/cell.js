@@ -199,8 +199,10 @@ var Cell = Backgrid.Cell = Backbone.View.extend({
   editor: InputCellEditor,
 
   /** @property */
-  events: {
-    "click": "enterEditMode"
+  events : function() {
+    return {
+      "click" : "onCellClick"
+    }
   },
 
   /**
@@ -231,7 +233,6 @@ var Cell = Backgrid.Cell = Backbone.View.extend({
     this.formatter = formatter;
 
     this.editor = Backgrid.resolveNameToClass(this.editor, "CellEditor");
-
     this.listenTo(model, "change:" + column.get("name"), function () {
       if (!$el.hasClass("editor")) this.render();
     });
@@ -253,6 +254,11 @@ var Cell = Backgrid.Cell = Backbone.View.extend({
     if (Backgrid.callByNeed(column.renderable(), column, model)) $el.addClass("renderable");
 
     $el.addClass("column-" + column.get('name'));
+
+    var clickable = Backgrid.callByNeed(column.clickable(), column, model);
+    if (clickable) {
+      $el.addClass("cell-clickable");
+    }
   },
 
   /**
@@ -265,6 +271,23 @@ var Cell = Backgrid.Cell = Backbone.View.extend({
     this.$el.text(this.formatter.fromRaw(model.get(this.column.get("name")), model));
     this.delegateEvents();
     return this;
+  },
+
+  onCellClick : function() {
+    var model = this.model;
+    var column = this.column;
+
+    //if model is undefined - return - it is header
+    if (_.isUndefined(model))
+      return;
+
+    var clickable = Backgrid.callByNeed(column.clickable(), column, model);
+    if (clickable) {
+      model.trigger('onCellClick', model, column);
+      return;
+    }
+
+    this.enterEditMode();
   },
 
   /**
@@ -1026,9 +1049,37 @@ var SelectCell = Backgrid.SelectCell = Cell.extend({
 
 });
 
-var HtmlCell = Backgrid.HtmlCell = Backbone.View.extend({
+var HtmlCell = Backgrid.HtmlCell = Backgrid.Cell.extend({
   tagName : "td",
 
+  initialize: function (options) {
+    Backgrid.Cell.prototype.initialize.call(this, options);
+
+    this.html = options.html || undefined;
+
+    if (_.isUndefined(this.html) && this.column.get('html')) {
+      this.html = this.column.get('html');
+    }
+  },
+
+  render: function () {
+    this.$el.empty();
+
+    var value = this.html;
+    if (_.isFunction(this.html)) {
+      value = this.html.call(this, this.column, this.model, this.$el);
+    }
+
+    this.$el.html(value);
+    this.delegateEvents();
+    return this;
+  }
+});
+
+var HeaderHtmlCell = Backgrid.HeaderHtmlCell = Backgrid.HtmlCell.extend({
+  tagName : "th",
+
+  //in header we don't have model, so we can't call Backgrid.Cell.prototype.initialize
   initialize: function (options) {
     this.html = options.html || undefined;
 
@@ -1045,18 +1096,5 @@ var HtmlCell = Backgrid.HtmlCell = Backbone.View.extend({
     }
 
     this.$el.addClass("column-" + column.get('name'));
-  },
-
-  render: function () {
-    this.$el.empty();
-
-    var value = this.html;
-    if (_.isFunction(this.html)) {
-      value = this.html.call(this, this.column, this.model, this.$el);
-    }
-
-    this.$el.html(value);
-    this.delegateEvents();
-    return this;
   }
 });

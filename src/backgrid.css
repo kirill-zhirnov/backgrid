@@ -238,3 +238,7 @@
 .backgrid .select-cell.editor option::-o-focus-inner {
   border: 0;
 }
+
+.backgrid .cell-clickable {
+  cursor: pointer;
+}

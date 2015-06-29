@@ -198,7 +198,7 @@ var FilterRow = Backgrid.FilterRow = Backgrid.HeaderRow.extend({
       html = '';
     }
 
-    return new Backgrid.HtmlCell({
+    return new Backgrid.HeaderHtmlCell({
       column : column,
       tagName : 'th',
       html : html

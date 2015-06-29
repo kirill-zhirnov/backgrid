@@ -92,6 +92,7 @@ var Column = Backgrid.Column = Backbone.Model.extend({
     sortable: true,
     editable: true,
     renderable: true,
+    clickable : false,
     formatter: undefined,
     sortType: "cycle",
     sortValue: undefined,
@@ -194,7 +195,7 @@ var Column = Backgrid.Column = Backbone.Model.extend({
   */
 });
 
-_.each(["sortable", "renderable", "editable"], function (key) {
+_.each(["sortable", "renderable", "editable", "clickable"], function (key) {
   Column.prototype[key] = function () {
     var value = this.get(key);
     if (_.isString(value)) return this[value];
