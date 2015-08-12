@@ -191,6 +191,8 @@ var FilterRow = Backgrid.FilterRow = Backgrid.HeaderRow.extend({
 
       if (_.isString(filter)) {
         html = filter;
+      } else if (_.isFunction(filter)) {
+        html = filter.call(this, column, options);
       } else {
         html = this.createFilterHtml(column, filter);
       }
