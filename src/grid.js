@@ -178,11 +178,11 @@ var Grid = Backgrid.Grid = Backbone.View.extend({
       this.$el.append(this.header.render().$el);
     }
 
+    this.$el.append(this.body.render().$el);
+
     if (this.footer) {
       this.$el.append(this.footer.render().$el);
     }
-
-    this.$el.append(this.body.render().$el);
 
     this.delegateEvents();
 
