@@ -77,7 +77,6 @@ var Body = Backgrid.Body = Backbone.View.extend({
         column.set("direction", (this.collection.state.order == -1) ? 'ascending' : 'descending');
       }
     }
-
   },
 
   _unshiftEmptyRowMayBe: function () {
@@ -283,7 +282,7 @@ var Body = Backgrid.Body = Backbone.View.extend({
 
     var collection = this.collection;
 
-    var order;
+    var order, that = this;
     if (direction === "ascending") order = -1;
     else if (direction === "descending") order = 1;
     else order = null;
@@ -296,7 +295,6 @@ var Body = Backgrid.Body = Backbone.View.extend({
                                          });
 
     collection.trigger("backgrid:beforeSort", column, direction);
-
     if (Backbone.PageableCollection &&
         collection instanceof Backbone.PageableCollection) {
 
@@ -312,8 +310,16 @@ var Body = Backgrid.Body = Backbone.View.extend({
         }
         collection.fullCollection.sort();
         collection.trigger("backgrid:sorted", column, direction, collection);
+        column.set("direction", direction);
       }
       else collection.fetch({reset: true, success: function () {
+        column = that.columns.findWhere({name: collection.state.sortKey});
+        direction = (collection.state.order == -1) ? 'ascending' : 'descending';
+
+        if (column) {
+          column.set("direction", direction);
+        }
+
         collection.trigger("backgrid:sorted", column, direction, collection);
       }});
     }
@@ -321,9 +327,9 @@ var Body = Backgrid.Body = Backbone.View.extend({
       collection.comparator = comparator;
       collection.sort();
       collection.trigger("backgrid:sorted", column, direction, collection);
-    }
 
-    column.set("direction", direction);
+      column.set("direction", direction);
+    }
 
     return this;
   },
