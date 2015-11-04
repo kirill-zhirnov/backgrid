@@ -259,6 +259,8 @@ var Cell = Backgrid.Cell = Backbone.View.extend({
     if (clickable) {
       $el.addClass("cell-clickable");
     }
+
+    $el.addClass(column.get('customClass'));
   },
 
   /**
