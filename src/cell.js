@@ -275,7 +275,7 @@ var Cell = Backgrid.Cell = Backbone.View.extend({
     return this;
   },
 
-  onCellClick : function() {
+  onCellClick : function(e) {
     var model = this.model;
     var column = this.column;
 
@@ -285,7 +285,12 @@ var Cell = Backgrid.Cell = Backbone.View.extend({
 
     var clickable = Backgrid.callByNeed(column.clickable(), column, model);
     if (clickable) {
-      model.trigger('backgrid:onCellClick', model, column);
+      var $el = Backbone.$(e.target);
+      if ($el.prop('tagName') == 'a') {
+        return;
+      }
+
+      model.trigger('backgrid:onCellClick', model, column, e);
       return;
     }
 
