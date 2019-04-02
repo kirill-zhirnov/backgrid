@@ -180,7 +180,7 @@ var FilterRow = Backgrid.FilterRow = Backgrid.HeaderRow.extend({
 
   /** @property */
   events: {
-    "change :input": "onFilterChange"
+    "change :input:not(.skip)": "onFilterChange"
   },
 
   makeCell: function (column, options) {
